@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -14,34 +15,24 @@ import android.util.Log;
 public class MyService extends Service {
     private static final String TAG = "zjy";
 
-    private MyBinder mBinder = new MyBinder();
-    private OnTestListener mListener;
+    private IMyCallbackListener mListener;
+    
+    private IMyAidlInterface.Stub mBinder = new IMyAidlInterface.Stub() {
+        @Override
+        public void testMethod(String msg) throws RemoteException {
+            Log.d(TAG, "receive message from activity: "+msg);
+            mListener.onRespond("hi, activity");
+        }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
+        @Override
+        public void registerListener(IMyCallbackListener listener) throws RemoteException {
+            mListener = listener;
+        }
+    };
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
-
-    public class MyBinder extends Binder {
-
-        public void testMethod(String msg) {
-            Log.d(TAG, "receive message from activity: "+msg);
-            mListener.onTest("hi, activity");
-        }
-
-        public void setOnTestListener(OnTestListener listener) {
-            mListener = listener;
-        }
-    }
-
-    public interface OnTestListener {
-        void onTest(String str);
-    }
-
 }
