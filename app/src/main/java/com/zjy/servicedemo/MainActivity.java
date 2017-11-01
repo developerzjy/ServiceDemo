@@ -10,7 +10,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 
-public class MainActivity extends Activity{
+public class MainActivity extends Activity {
 
     private static final String TAG = "zjy";
 
@@ -21,14 +21,9 @@ public class MainActivity extends Activity{
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = IMyAidlInterface.Stub.asInterface(service);
 
-            try{
-                mService.registerListener(new IMyCallbackListener.Stub() {
-                    @Override
-                    public void onRespond(String str) throws RemoteException {
-                        Log.d(TAG, "receive message from service: "+str);
-                    }
-                });
-            } catch (Exception e){
+            try {
+                mService.registerListener(mListener);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -44,7 +39,7 @@ public class MainActivity extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = new Intent(MainActivity.this, MyService.class);
-        bindService(intent,mConnection,BIND_AUTO_CREATE);
+        bindService(intent, mConnection, BIND_AUTO_CREATE);
 
         findViewById(R.id.bt1).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,5 +51,23 @@ public class MainActivity extends Activity{
                 }
             }
         });
+
+        findViewById(R.id.bt2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    mService.unregisterListener(mListener);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
+
+    private IMyCallbackListener.Stub mListener = new IMyCallbackListener.Stub() {
+        @Override
+        public void onRespond(String str) throws RemoteException {
+            Log.d(TAG, "receive message from service: " + str);
+        }
+    };
 }

@@ -10,6 +10,12 @@
         android:id="@+id/bt1"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="bind service"/>
+        android:text="send message"/>
+
+    <Button
+        android:id="@+id/bt2"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="unregisterListener"/>
 
 </LinearLayout>
