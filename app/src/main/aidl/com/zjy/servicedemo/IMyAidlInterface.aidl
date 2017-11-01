@@ -7,4 +7,5 @@ import com.zjy.servicedemo.IMyCallbackListener;
 interface IMyAidlInterface {
     void testMethod(String msg);
     void registerListener(IMyCallbackListener listener);
+    void unregisterListener(IMyCallbackListener listener);
 }
