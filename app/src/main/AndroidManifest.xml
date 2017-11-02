@@ -16,7 +16,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MyService" />
+        <service android:name=".MyService"
+            android:process=":remote"/>
     </application>
 
 </manifest>
