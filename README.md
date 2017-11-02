@@ -1,1 +1,3 @@
 # ServiceDemo
+
+Activity与Service在多进程下使用Messenger通信
