@@ -10,64 +10,43 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 
+import com.zjy.servicedemo.com.zjy.servicedemo.binder.BinderPool;
+
 public class MainActivity extends Activity {
 
     private static final String TAG = "zjy";
 
-    private IMyAidlInterface mService;
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = IMyAidlInterface.Stub.asInterface(service);
-
-            try {
-                mService.registerListener(mListener);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-    };
+    private BinderPool mBinderPool;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = new Intent(MainActivity.this, MyService.class);
-        bindService(intent, mConnection, BIND_AUTO_CREATE);
 
         findViewById(R.id.bt1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    mService.testMethod("hi, service");
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mBinderPool = BinderPool.getInstance(MainActivity.this);
+                        IBird bird = IBird.Stub.asInterface(mBinderPool.queryAnimal(BinderPool.ANIMAL_CODE_BIRD));
+                        IFish fish = IFish.Stub.asInterface(mBinderPool.queryAnimal(BinderPool.ANIMAL_CODE_FISH));
+                        IMonkey monkey = IMonkey.Stub.asInterface(mBinderPool.queryAnimal(BinderPool.ANIMAL_CODE_MONKEY));
+
+                        try {
+                            bird.fly();
+                            fish.swim();
+                            monkey.climbTree();
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
             }
         });
 
-        findViewById(R.id.bt2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    mService.unregisterListener(mListener);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
-    private IMyCallbackListener.Stub mListener = new IMyCallbackListener.Stub() {
-        @Override
-        public void onRespond(String str) throws RemoteException {
-            Log.d(TAG, "receive message from service: " + str);
-        }
-    };
 }

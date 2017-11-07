@@ -9,6 +9,8 @@ import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.zjy.servicedemo.com.zjy.servicedemo.binder.BinderPool;
+
 /**
  * Created by zjy on 2017/10/31.
  */
@@ -16,29 +18,7 @@ import android.util.Log;
 public class MyService extends Service {
     private static final String TAG = "zjy";
 
-    private RemoteCallbackList<IMyCallbackListener> mListenerList = new RemoteCallbackList<>();
-    
-    private IMyAidlInterface.Stub mBinder = new IMyAidlInterface.Stub() {
-        @Override
-        public void testMethod(String msg) throws RemoteException {
-            Log.d(TAG, "receive message from activity: "+msg);
-            int count = mListenerList.beginBroadcast();
-            for (int i = 0; i < count; i++) {
-                mListenerList.getBroadcastItem(i).onRespond("hi, activity");
-            }
-            mListenerList.finishBroadcast();
-        }
-
-        @Override
-        public void registerListener(IMyCallbackListener listener) throws RemoteException {
-            mListenerList.register(listener);
-        }
-
-        @Override
-        public void unregisterListener(IMyCallbackListener listener) throws RemoteException {
-            mListenerList.unregister(listener);
-        }
-    };
+    private BinderPool.AnimalBinder mBinder = new BinderPool.AnimalBinder();
 
     @Nullable
     @Override
